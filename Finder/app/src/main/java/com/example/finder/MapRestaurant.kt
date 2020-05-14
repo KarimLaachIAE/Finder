@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.finder.Common.Common
@@ -35,12 +36,12 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mLastLocation: Location
     private var mMarker: Marker?=null
 
-    companion object { private const val MY_PERMISSION_CODE: Int = 1000 }
-
     //Location
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     lateinit var locationRequest: LocationRequest
     lateinit var locationCallback: LocationCallback
+
+    companion object { private const val MY_PERMISSION_CODE: Int = 1000 }
 
     lateinit var mService:IGoogleAPIService
 
@@ -78,64 +79,61 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
 
-        val placeChoix = intent.getStringExtra("CHOIX")
-        when(placeChoix)
-        {
-            "Restaurants" -> nearByPlace("restaurant")
-            "Bars" -> nearByPlace("bar")
-            "Musées" -> nearByPlace("museum")
-            "SuperMarché" -> nearByPlace("supermarket")
-            "Hopital" -> nearByPlace("hospital")
-            "Magasins" -> nearByPlace("shopping_mall")
-        }
-
+        nearByPlace(intent.getStringExtra("CHOIX"))
     }
 
     private fun nearByPlace(typePlace: String) {
-        //Build URL
-        var url = getUrl(latitude, longitude, typePlace)
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+            latitude = location.latitude
+            longitude = location.longitude
+            Toast.makeText(applicationContext, "latitude1: $latitude \n longitude1 : $longitude", Toast.LENGTH_LONG).show()
+            mMap.clear() // ????
 
-        mService.getNearbyPlaces(url)
-            .enqueue(object:Callback<MyPlaces>{
-                override fun onFailure(call: Call<MyPlaces>, t: Throwable) {
-                    Toast.makeText(baseContext, ""+t.message, Toast.LENGTH_SHORT).show()
-                }
+            var url = getUrl(latitude, longitude, typePlace)
 
-                override fun onResponse(call: Call<MyPlaces>, response: Response<MyPlaces>) {
-                    currentPlace = response.body()!!
+            mService.getNearbyPlaces(url)
+                .enqueue(object:Callback<MyPlaces>{
+                    override fun onFailure(call: Call<MyPlaces>, t: Throwable) {
+                        Toast.makeText(baseContext, ""+t.message, Toast.LENGTH_SHORT).show()
+                    }
 
-                    if(response.isSuccessful)
-                    {
+                    override fun onResponse(call: Call<MyPlaces>, response: Response<MyPlaces>) {
+                        currentPlace = response.body()!!
 
-                        for(i in 0 until response.body()!!.results!!.size)
+                        if(response.isSuccessful)
                         {
-                            val markerOptions=MarkerOptions()
-                            val googlePlace = response.body()!!.results!![i]
-                            val lat = googlePlace.geometry!!.location!!.lat
-                            val lng = googlePlace.geometry!!.location!!.lng
-                            val placeName = googlePlace.name
-                            val latLng = LatLng(lat, lng)
 
-                            markerOptions.position(latLng)
-                            markerOptions.title(placeName)
-                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                            markerOptions.snippet(i.toString()) //Assign index for marker
+                            for(i in 0 until response.body()!!.results!!.size)
+                            {
+                                val markerOptions=MarkerOptions()
+                                val googlePlace = response.body()!!.results!![i]
+                                val lat = googlePlace.geometry!!.location!!.lat
+                                val lng = googlePlace.geometry!!.location!!.lng
+                                val placeName = googlePlace.name
+                                val latLng = LatLng(lat, lng)
 
-                            mMap.addMarker(markerOptions) //Add marker to map
+                                markerOptions.position(latLng)
+                                markerOptions.title(placeName)
+                                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                markerOptions.snippet(i.toString()) //Assign index for marker
 
-                            //Move camera
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                            mMap.animateCamera(CameraUpdateFactory.zoomTo(20f))
+                                mMap!!.addMarker(markerOptions) //Add marker to map
+
+                                //Move camera
+                                mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+                                mMap!!.animateCamera(CameraUpdateFactory.zoomTo(20f))
+
+                            }
+
 
                         }
-
-
-
-
                     }
-                }
 
-            })
+                })
+
+        }
+
+
     }
 
     private fun getUrl(latitude: Double, longitude: Double, typePlace: String): String {
@@ -162,7 +160,6 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
 
                 latitude = mLastLocation.latitude
                 longitude = mLastLocation.longitude
-                //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
 
                 val latLng = LatLng(latitude,longitude)
                 val markerOptions = MarkerOptions()
@@ -174,6 +171,8 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
                 //move camera
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
+
+                //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -184,6 +183,8 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.interval = 5000
         locationRequest.fastestInterval = 3000
         locationRequest.smallestDisplacement = 10f
+
+        //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
     }
 
     private fun checkLocationPermission(): Boolean {
@@ -196,16 +197,14 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
             return false
         }
         else
+        {
             return true
+        }
     }
 
     //override onRequestPermissionResult
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when(requestCode)
         {
             MY_PERMISSION_CODE->{
@@ -241,11 +240,8 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
 
         //Init google play services
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            {
                 mMap.isMyLocationEnabled = true
             }
         }
@@ -255,4 +251,5 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
         //enabled zoom control
         mMap.uiSettings.isZoomControlsEnabled=true
     }
+
 }
