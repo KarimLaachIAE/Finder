@@ -68,6 +68,7 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
 
                 fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+
             }
         }
         else
@@ -79,19 +80,13 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
         }
 
-        nearByPlace(intent.getStringExtra("CHOIX"))
+
     }
 
     private fun nearByPlace(typePlace: String) {
-        fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
-            latitude = location.latitude
-            longitude = location.longitude
-            Toast.makeText(applicationContext, "latitude1: $latitude \n longitude1 : $longitude", Toast.LENGTH_LONG).show()
-            mMap.clear() // ????
+        var url = getUrl(latitude, longitude, typePlace)
 
-            var url = getUrl(latitude, longitude, typePlace)
-
-            mService.getNearbyPlaces(url)
+        mService.getNearbyPlaces(url)
                 .enqueue(object:Callback<MyPlaces>{
                     override fun onFailure(call: Call<MyPlaces>, t: Throwable) {
                         Toast.makeText(baseContext, ""+t.message, Toast.LENGTH_SHORT).show()
@@ -131,9 +126,6 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
 
                 })
 
-        }
-
-
     }
 
     private fun getUrl(latitude: Double, longitude: Double, typePlace: String): String {
@@ -172,6 +164,7 @@ class MapRestaurant : AppCompatActivity(), OnMapReadyCallback {
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(11f))
 
+                nearByPlace(intent.getStringExtra("CHOIX"))
                 //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
             }
         }
