@@ -8,7 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                     "Magasins" -> choix = "shopping_mall"
                 }
                 Toast.makeText(applicationContext, "Position: $position \n Item Value : $itemValue", Toast.LENGTH_LONG).show()
-                val intent = Intent(this@MainActivity, MapRestaurant::class.java)
+                val intent = Intent(this@MainActivity, MapActivity::class.java)
                 intent.putExtra("CHOIX", choix)
                 startActivity(intent)
             }
