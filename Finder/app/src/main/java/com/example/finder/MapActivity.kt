@@ -1,5 +1,6 @@
 package com.example.finder
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -115,7 +116,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                                 //Move camera
                                 mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-                                mMap!!.animateCamera(CameraUpdateFactory.zoomTo(20f))
+                                mMap!!.animateCamera(CameraUpdateFactory.zoomTo(10f))
 
                             }
 
@@ -142,7 +143,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun buildLocationCallBack() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult?) {
-                mLastLocation = p0!!.locations.get(p0.locations.size-1) //get last location
+                mLastLocation = p0!!.lastLocation //get last location
 
                 if(mMarker != null)
                 {
@@ -230,6 +231,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
+        //enabled zoom control
+        mMap.uiSettings.isZoomControlsEnabled=true
+
         //Init google play services
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -240,8 +244,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         else
             mMap.isMyLocationEnabled = true
 
-        //enabled zoom control
-        mMap.uiSettings.isZoomControlsEnabled=true
+        mMap!!.setOnMarkerClickListener { marker ->
+            if(marker.snippet != null) {
+                Common.currentResult = currentPlace!!.results!![Integer.parseInt(marker.snippet)]
+
+                startActivity(Intent(this@MapActivity, ViewPlace::class.java))
+            }
+            true
+        }
     }
 
 }

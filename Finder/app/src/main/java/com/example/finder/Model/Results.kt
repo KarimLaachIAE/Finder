@@ -14,4 +14,5 @@ class Results {
     var types:Array<String>?=null
     var vicinity:String?=null
     var opening_hours:OpeningHours?=null
+
 }
