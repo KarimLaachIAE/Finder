@@ -25,7 +25,8 @@ class ViewPlace : AppCompatActivity() {
         place_name.text = Common.currentResult!!.name
         place_adress.text = Common.currentResult!!.vicinity
 
-        if(Common.currentResult!!.opening_hours!!.open_now){
+
+        if(Common.currentResult!!.opening_hours != null && Common.currentResult!!.opening_hours!!.open_now){
             place_open_hour.text = "Actuellement ouvert"
         }else{
             place_open_hour.text = "Actuellement fermé"

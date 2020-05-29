@@ -8,22 +8,24 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
+import com.example.finder.Remote.CustomAdapter
 
 class MainActivity : AppCompatActivity() {
 
     val elements = arrayOf("Restaurants","Bars","Musées","SuperMarché","Hopital","Magasins")
+    val img = arrayOf(R.drawable.restaurant, R.drawable.bar, R.drawable.musee, R.drawable.supermarche, R.drawable.hopital, R.drawable.magasin)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val adapter = ArrayAdapter(this,R.layout.custom_list, elements)
+        val adapter = CustomAdapter(this, elements, img)
         val listView: ListView = findViewById(R.id.listView_1)
         listView.setAdapter(adapter)
 
         listView.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long){
-                val itemValue = listView.getItemAtPosition(position) as String
+                val itemValue = listView.getItemAtPosition(position) as String //ERROR IL FAUT DIRE SI ON CLIQUE SUR LIMAGE OU SUR LE TEXT CE QUIL SE PASSE
                 var choix: String?= null
                 when(itemValue)
                 {
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                     "Hopital" -> choix = "hospital"
                     "Magasins" -> choix = "shopping_mall"
                 }
-                Toast.makeText(applicationContext, "Position: $position \n Item Value : $itemValue", Toast.LENGTH_LONG).show()
+                //Toast.makeText(applicationContext, "Position: $position \n Item Value : $itemValue", Toast.LENGTH_LONG).show()
                 val intent = Intent(this@MainActivity, MapActivity::class.java)
                 intent.putExtra("CHOIX", choix)
                 startActivity(intent)

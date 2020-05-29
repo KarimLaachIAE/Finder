@@ -280,7 +280,9 @@ class ViewDirections : AppCompatActivity(), OnMapReadyCallback {
 
             }
 
-            mMap!!.addPolyline(polylineOptions)
+            if (polylineOptions != null) {
+                mMap!!.addPolyline(polylineOptions)
+            }
             waitingDialog.dismiss()
 
         }
