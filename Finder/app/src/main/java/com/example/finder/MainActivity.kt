@@ -13,7 +13,7 @@ import com.example.finder.Remote.CustomAdapter
 class MainActivity : AppCompatActivity() {
 
     val elements = arrayOf("Restaurants","Bars","Musées","SuperMarché","Hopital","Magasins")
-    val img = arrayOf(R.drawable.restaurant, R.drawable.bar, R.drawable.musee, R.drawable.supermarche, R.drawable.hopital, R.drawable.magasin)
+    val img = arrayOf(R.mipmap.restaurant2, R.mipmap.bar2, R.mipmap.musee2, R.mipmap.supermarche2, R.mipmap.hopital2, R.mipmap.magasin2)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
