@@ -55,14 +55,14 @@ class ViewPlace : AppCompatActivity() {
 
     }
 
-    private fun getPlaceDetailUrl(place_id: String): String{
+    fun getPlaceDetailUrl(place_id: String): String{
         val url = StringBuilder("https://maps.googlesapis.com/maps/api/place/details/json")
         url.append("?placeid=$place_id")
         url.append("&key=AIzaSyC3WmR6rsB26GfTw0WgGkRMrDRvEXB-Gyw")
         return url.toString()
     }
 
-    private fun getPhotoOfPlace(photo_reference: String, maxWidth: Int): String {
+    fun getPhotoOfPlace(photo_reference: String, maxWidth: Int): String {
         val url = StringBuilder("https://maps.googleapis.com/maps/api/place/photo")
         url.append("?maxwidth=$maxWidth")
         url.append("&photoreference=$photo_reference")

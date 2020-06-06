@@ -128,7 +128,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun getUrl(latitude: Double, longitude: Double, typePlace: String): String {
+    fun getUrl(latitude: Double, longitude: Double, typePlace: String): String {
         //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
         val googlePlaceUrl = StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json")
         googlePlaceUrl.append("?location=$latitude,$longitude")
@@ -136,7 +136,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         googlePlaceUrl.append("&type=$typePlace")
         googlePlaceUrl.append("&key=AIzaSyC3WmR6rsB26GfTw0WgGkRMrDRvEXB-Gyw")
 
-        Log.d("URL_DEBUG", googlePlaceUrl.toString())
+        //Log.d("URL_DEBUG", googlePlaceUrl.toString())
         return googlePlaceUrl.toString()
     }
 
@@ -180,7 +180,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         //Toast.makeText(applicationContext, "latitude: $latitude \n longitude : $longitude", Toast.LENGTH_LONG).show()
     }
 
-    private fun checkLocationPermission(): Boolean {
+    fun checkLocationPermission(): Boolean {
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION))
